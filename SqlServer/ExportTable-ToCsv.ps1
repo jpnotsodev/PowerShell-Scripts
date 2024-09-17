@@ -30,15 +30,19 @@ Param (
 
 Import-Module SqlServer
 
-$QueryToExecute = "SELECT * FROM {0}"
+$TimeStamp = Get-Date -Format "yyyyMMddThhmmss"
 
 If ($Table.Length -gt 1) {
-    ForEach ($T in $Table) { 
+    ForEach ($T in $Table) {
+        $FileName = $T + "_" + $TimeStamp + ".csv"
+        $FullPath = Join-Path -Path $Path -ChildPath $FileName
         Invoke-Sqlcmd -ServerInstance $Server -Username $Username -Password $Password -Database $Database -TrustServerCertificate -Query "SELECT * FROM $T" `
-            | Export-Csv -Path $Path -Delimiter $Delimiter -NoTypeInformation
+            | Export-Csv -Path $FullPath -Delimiter $Delimiter -NoTypeInformation
     }
 } Else { 
+    $FileName = $T + "_" + $TimeStamp + ".csv"
+    $FullPath = Join-Path -Path $Path -ChildPath $FileName
     Invoke-Sqlcmd -ServerInstance $Server -Username $Username -Password $Password -Database $Database -TrustServerCertificate -Query "SELECT * FROM $Table" `
-        | Export-Csv -Path "$Path" -Delimiter $Delimiter -NoTypeInformation
+        | Export-Csv -Path $FullPath -Delimiter $Delimiter -NoTypeInformation
 }
 
